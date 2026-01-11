@@ -1,3 +1,5 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   name: demo-dev
   namespace: argocd
@@ -6,3 +8,19 @@ metadata:
     argocd-image-updater.argoproj.io/app.update-strategy: semver
     argocd-image-updater.argoproj.io/app.allow-tags: regexp:^1\..*
     argocd-image-updater.argoproj.io/write-back-method: git
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Francesco301100/gitops-demo.git
+    targetRevision: main
+    path: charts/demo-app
+    helm:
+      valueFiles:
+        - ../../environments/dev/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
